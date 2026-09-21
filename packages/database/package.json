@@ -1,0 +1,23 @@
+{
+  "name": "@career-clarity/database",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "ts-node prisma/seed.ts",
+    "lint": "eslint src/",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1"
+  },
+  "devDependencies": {
+    "@career-clarity/typescript-config": "workspace:*",
+    "prisma": "^6.4.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
