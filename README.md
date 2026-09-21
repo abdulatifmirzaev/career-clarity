@@ -102,8 +102,7 @@ flowchart TD
 - [x] **Phase 1: Database Architecture & Seeding** (Prisma Schema, PostgreSQL relations, comprehensive seed data)
 - [x] **Phase 2: Backend Core Infrastructure** (NestJS setup, JWT Auth with Refresh Tokens, Swagger, Global Filters)
 - [x] **Phase 3: Backend Feature Modules** (Leveling engine, Roadmap tree generator, Interview bank, Assessment scorer)
-- [x] **Phase 4: Frontend Core Infrastructure** (Next.js 15, Tailwind design tokens, responsive sidebar/header, Onboarding flow)
-- [ ] **Phase 5: Frontend Feature Pages** (Dashboard, Interactive Leveling benchmark, React Flow roadmap, Interview prep)
+- [x] **Phase 5: Frontend Feature Pages** (Executive Dashboard, Cross-Company Leveling Comparator, React Flow Roadmap, Interview Bank & Diagnostic Assessment)
 - [ ] **Phase 6: Integration, Testing & Accessibility** (TanStack Query integration, 375px–1440px responsive testing, a11y 90+)
 - [ ] **Phase 7: Production Deployment & CI/CD** (GitHub Actions CI, Vercel & Railway/Render deployment, environment config)
 

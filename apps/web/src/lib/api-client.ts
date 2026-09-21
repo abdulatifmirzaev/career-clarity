@@ -14,7 +14,11 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+export interface ApiClientOptions extends Omit<RequestInit, 'body'> {
+  body?: BodyInit | object | null;
+}
+
+export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('career_clarity_access_token') : null;
 
@@ -30,8 +34,23 @@ export async function apiClient<T>(endpoint: string, options: RequestInit = {}):
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${API_BASE_URL}${cleanEndpoint}`;
 
+  let requestBody: BodyInit | null | undefined;
+  if (options.body !== undefined && options.body !== null) {
+    if (
+      typeof options.body === 'object' &&
+      !(options.body instanceof FormData) &&
+      !(options.body instanceof Blob) &&
+      !(options.body instanceof ArrayBuffer)
+    ) {
+      requestBody = JSON.stringify(options.body);
+    } else {
+      requestBody = options.body as BodyInit;
+    }
+  }
+
   const response = await fetch(url, {
     ...options,
+    body: requestBody,
     headers,
   });
 
