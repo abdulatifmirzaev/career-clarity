@@ -137,6 +137,29 @@ export interface AssessmentDto {
   createdAt: string;
 }
 
+export interface LevelComparisonRequest {
+  yearsExp: number;
+  currentTitle?: string;
+  systemDesignScore?: number; // 1 - 5
+  leadershipScore?: number; // 1 - 5
+}
+
+export interface UpdateSkillProgressRequest {
+  status: SkillProgressStatus;
+}
+
+export interface QuizAnswer {
+  questionId: string;
+  selectedOption: number;
+}
+
+export interface SubmitAssessmentRequest {
+  role: RoleType;
+  yearsExp: number;
+  answers: QuizAnswer[];
+  primaryStack?: string;
+}
+
 /**
  * API Standard Response Envelope
  */
