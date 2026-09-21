@@ -7,7 +7,9 @@
   "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "ts-node prisma/seed.ts",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
     "lint": "eslint src/",
     "check-types": "tsc --noEmit"
   },
@@ -16,8 +18,9 @@
   },
   "devDependencies": {
     "@career-clarity/typescript-config": "workspace:*",
+    "@types/node": "^22.13.9",
     "prisma": "^6.4.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }
 }

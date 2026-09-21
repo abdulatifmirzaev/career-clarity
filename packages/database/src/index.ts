@@ -1,4 +1,19 @@
-// Placeholder for Prisma client export in Phase 0
-// Will be fully generated in Phase 1
-export type * from '@prisma/client';
-export const DATABASE_PACKAGE_VERSION = '0.0.1';
+import { PrismaClient } from '@prisma/client';
+
+declare global {
+  var __prismaClient: PrismaClient | undefined;
+}
+
+export const prisma =
+  global.__prismaClient ||
+  new PrismaClient({
+    log: process.env['NODE_ENV'] === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+
+if (process.env['NODE_ENV'] !== 'production') {
+  global.__prismaClient = prisma;
+}
+
+export * from '@prisma/client';
+export { PrismaClient };
+export default prisma;

@@ -1,0 +1,133 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String                @id @default(cuid())
+  email           String                @unique
+  passwordHash    String
+  name            String?
+  yearsExp        Int?
+  primaryStack    String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  assessments     Assessment[]
+  progress        UserSkillProgress[]
+  solvedQuestions UserQuestionAttempt[]
+
+  @@map("users")
+}
+
+model Company {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  slug      String         @unique
+  createdAt DateTime       @default(now())
+  levels    CompanyLevel[]
+
+  @@map("companies")
+}
+
+model CompanyLevel {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  levelName   String   // "L4", "Senior", "Mid", etc.
+  levelOrder  Int      // 1 (Junior/Entry) to 10 (Fellow/VP)
+  yearsExpMin Int
+  yearsExpMax Int
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([levelOrder])
+  @@map("company_levels")
+}
+
+model Skill {
+  id          String              @id @default(cuid())
+  name        String              @unique
+  category    String              // "Backend", "Frontend", "System Design", "DevOps", "AI / ML"
+  aiRelevance String              // "critical" | "eased_by_ai" | "declining"
+  description String?
+  createdAt   DateTime            @default(now())
+  nodes       RoadmapNode[]
+  progress    UserSkillProgress[]
+
+  @@index([category])
+  @@map("skills")
+}
+
+model RoadmapNode {
+  id           String        @id @default(cuid())
+  skillId      String
+  skill        Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  role         String        // "backend" | "frontend" | "fullstack" | "ai_engineer"
+  levelOrder   Int           // 1 to 5+
+  parentNodeId String?
+  parentNode   RoadmapNode?  @relation("NodeHierarchy", fields: [parentNodeId], references: [id], onDelete: SetNull)
+  children     RoadmapNode[] @relation("NodeHierarchy")
+  createdAt    DateTime      @default(now())
+
+  @@index([role, levelOrder])
+  @@map("roadmap_nodes")
+}
+
+model UserSkillProgress {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId   String
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  status    String   @default("not_started") // "not_started" | "in_progress" | "mastered"
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([userId, skillId])
+  @@map("user_skill_progress")
+}
+
+model InterviewQuestion {
+  id         String                @id @default(cuid())
+  question   String
+  answer     String?
+  hint       String?
+  category   String                // "Data Structures", "System Design", "Architecture", "Behavioral", "AI Engineering"
+  role       String?               // "backend", "frontend", "fullstack", "ai_engineer", or null for universal
+  levelOrder Int                   // 1 to 5+
+  createdAt  DateTime              @default(now())
+  attempts   UserQuestionAttempt[]
+
+  @@index([category, levelOrder])
+  @@map("interview_questions")
+}
+
+model UserQuestionAttempt {
+  id          String            @id @default(cuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId  String
+  question    InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  solved      Boolean           @default(false)
+  notes       String?
+  attemptedAt DateTime          @default(now())
+
+  @@unique([userId, questionId])
+  @@map("user_question_attempts")
+}
+
+model Assessment {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resultLevelOrder Int
+  reportJson       Json     // CareerClarityReport JSON object
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@map("assessments")
+}
