@@ -850,7 +850,7 @@ async function main() {
   const demoUser = await prisma.user.create({
     data: {
       email: 'alex.chen@careerclarity.dev',
-      passwordHash: '$2b$10$EpRnTzVlqHNP0.fUbXUwSOyuiXe/QLSUG6xgn50qGmx8wdc1ZWDm.', // demo12345
+      passwordHash: '$2b$10$dlIhg0ov.HyMR.4N3zRrzuEipWLP5kgabv1BUcgvvpE.w8/Qvei7.', // demo12345
       name: 'Alex Chen',
       yearsExp: 4,
       primaryStack: 'TypeScript, React, Node.js, PostgreSQL',
