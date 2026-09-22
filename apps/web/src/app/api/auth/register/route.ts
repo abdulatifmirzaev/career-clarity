@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       primaryStack,
     });
 
-    const tokens = generateAuthTokens(newUser.id, newUser.email);
+    const tokens = generateAuthTokens(newUser.id, newUser.email, newUser.role);
 
     return jsonSuccess(
       {
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
+          role: newUser.role,
           yearsExp: newUser.yearsExp,
           primaryStack: newUser.primaryStack,
           createdAt: newUser.createdAt,

@@ -12,8 +12,11 @@ model User {
   email           String                @unique
   passwordHash    String
   name            String?
+  role            String                @default("USER") // "USER" | "ADMIN" | "SUPERADMIN"
+  status          String                @default("ACTIVE") // "ACTIVE" | "SUSPENDED"
   yearsExp        Int?
   primaryStack    String?
+  lastLoginAt     DateTime?
   createdAt       DateTime              @default(now())
   updatedAt       DateTime              @updatedAt
   assessments     Assessment[]
@@ -130,4 +133,33 @@ model Assessment {
 
   @@index([userId])
   @@map("assessments")
+}
+
+model AssessmentQuizQuestion {
+  id                 String   @id @default(cuid())
+  category           String   // "System Design", "Coding & DS", "Architecture & Cloud", "DevOps & CI/CD", "Engineering Leadership"
+  question           String
+  options            Json     // string[]
+  correctOptionIndex Int
+  weight             Int      @default(10)
+  explanation        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([category])
+  @@map("assessment_quiz_questions")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminEmail String
+  action     String   // e.g., "USER_UPDATE", "QUESTION_CREATE", "ROADMAP_UPDATE"
+  targetType String   // e.g., "User", "InterviewQuestion", "Skill"
+  targetId   String?
+  details    Json?
+  createdAt  DateTime @default(now())
+
+  @@index([adminEmail])
+  @@index([action])
+  @@map("audit_logs")
 }

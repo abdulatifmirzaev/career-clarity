@@ -293,6 +293,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@career-clarity/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@career-clarity/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types

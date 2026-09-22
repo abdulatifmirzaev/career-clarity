@@ -88,8 +88,10 @@ export interface InterviewQuestionDto {
   answer?: string | null;
   hint?: string | null;
   category: string;
+  role?: string | null;
   levelOrder: number;
   isSolved?: boolean;
+  createdAt?: string;
 }
 
 export interface UserQuestionAttemptDto {
