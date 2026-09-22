@@ -1,0 +1,75 @@
+name: CI/CD Quality Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-build:
+    name: Lint, Typecheck, Test & Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: career_clarity_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/career_clarity_test?schema=public"
+      JWT_ACCESS_SECRET: "ci_jwt_access_secret_key_minimum_32_characters"
+      JWT_REFRESH_SECRET: "ci_jwt_refresh_secret_key_minimum_32_characters"
+      JWT_ACCESS_EXPIRES_IN: "15m"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js (v22.x LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @career-clarity/database db:generate
+
+      - name: Apply Database Migrations (Test DB)
+        run: pnpm --filter @career-clarity/database db:migrate
+
+      - name: Verify Code Quality & ESLint
+        run: pnpm lint
+
+      - name: Verify Strict TypeScript Types
+        run: pnpm check-types
+
+      - name: Execute Automated Unit & E2E Critical Journey Tests
+        run: pnpm --filter @career-clarity/api test
+
+      - name: Compile & Build Applications (Web & API)
+        run: pnpm build
