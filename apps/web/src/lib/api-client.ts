@@ -16,11 +16,29 @@ export class ApiError extends Error {
 
 export interface ApiClientOptions extends Omit<RequestInit, 'body'> {
   body?: BodyInit | object | null;
+  _retry?: boolean;
+}
+
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null = null) {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else if (token) {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
 }
 
 export async function apiClient<T>(endpoint: string, options: ApiClientOptions = {}): Promise<T> {
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('career_clarity_access_token') : null;
+  const isBrowser = typeof window !== 'undefined';
+  const token = isBrowser ? localStorage.getItem('career_clarity_access_token') : null;
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -53,6 +71,71 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     body: requestBody,
     headers,
   });
+
+  // Handle 401 Unauthorized with Automatic Token Refresh
+  if (response.status === 401 && !options._retry && isBrowser && !endpoint.includes('/auth/')) {
+    const refreshToken = localStorage.getItem('career_clarity_refresh_token');
+
+    if (refreshToken) {
+      if (isRefreshing) {
+        // Wait for current refresh to complete
+        return new Promise<string>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((newToken) => {
+          return apiClient<T>(endpoint, {
+            ...options,
+            _retry: true,
+            headers: {
+              ...headers,
+              Authorization: `Bearer ${newToken}`,
+            },
+          });
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (refreshResponse.ok) {
+          const refreshJson = await refreshResponse.json();
+          const refreshData = refreshJson.data || refreshJson;
+          const newAccessToken = refreshData.accessToken;
+          const newRefreshToken = refreshData.refreshToken;
+
+          localStorage.setItem('career_clarity_access_token', newAccessToken);
+          if (newRefreshToken) {
+            localStorage.setItem('career_clarity_refresh_token', newRefreshToken);
+          }
+
+          processQueue(null, newAccessToken);
+          isRefreshing = false;
+
+          return apiClient<T>(endpoint, {
+            ...options,
+            _retry: true,
+            headers: {
+              ...headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            },
+          });
+        } else {
+          throw new Error('Refresh token invalid or expired');
+        }
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        isRefreshing = false;
+        localStorage.removeItem('career_clarity_access_token');
+        localStorage.removeItem('career_clarity_refresh_token');
+        localStorage.removeItem('career_clarity_user');
+      }
+    }
+  }
 
   const json = await response.json().catch(() => null);
 

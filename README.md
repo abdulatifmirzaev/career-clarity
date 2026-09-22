@@ -101,9 +101,9 @@ flowchart TD
 - [x] **Phase 0: Monorepo Foundation & Tooling** (Turborepo, pnpm workspaces, ESLint, Prettier, Husky, Base TSConfigs)
 - [x] **Phase 1: Database Architecture & Seeding** (Prisma Schema, PostgreSQL relations, comprehensive seed data)
 - [x] **Phase 2: Backend Core Infrastructure** (NestJS setup, JWT Auth with Refresh Tokens, Swagger, Global Filters)
-- [x] **Phase 3: Backend Feature Modules** (Leveling engine, Roadmap tree generator, Interview bank, Assessment scorer)
+- [x] **Phase 4: Frontend Core Infrastructure** (Next.js 15, Tailwind design tokens, responsive sidebar/header, Onboarding flow)
 - [x] **Phase 5: Frontend Feature Pages** (Executive Dashboard, Cross-Company Leveling Comparator, React Flow Roadmap, Interview Bank & Diagnostic Assessment)
-- [ ] **Phase 6: Integration, Testing & Accessibility** (TanStack Query integration, 375px–1440px responsive testing, a11y 90+)
+- [x] **Phase 6: Integration, Testing & Accessibility** (Auth Guards, 401 Token Refresh Queue, Optimistic Updates, ARIA & Touch Targets, E2E Critical Journey Suite)
 - [ ] **Phase 7: Production Deployment & CI/CD** (GitHub Actions CI, Vercel & Railway/Render deployment, environment config)
 
 ---

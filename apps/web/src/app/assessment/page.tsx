@@ -217,8 +217,12 @@ export default function AssessmentPage() {
                     max={20}
                     step={1}
                     value={yearsExp}
+                    aria-label="Years of professional experience"
+                    aria-valuemin={0}
+                    aria-valuemax={20}
+                    aria-valuenow={yearsExp}
                     onChange={(e) => setYearsExp(Number(e.target.value))}
-                    className="w-full accent-primary cursor-pointer h-2 bg-secondary rounded-lg appearance-none mt-2"
+                    className="w-full accent-primary cursor-pointer h-2 bg-secondary rounded-lg appearance-none mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                   <p className="text-[11px] text-muted-foreground mt-1">
                     Used to compare your current technical scope with typical industry tenure.
@@ -279,15 +283,21 @@ export default function AssessmentPage() {
                         {q.question}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2 pt-0">
+                    <CardContent
+                      role="radiogroup"
+                      aria-label={`Question ${qIndex + 1}: ${q.question}`}
+                      className="space-y-2 pt-0"
+                    >
                       {q.options.map((option, optIdx) => {
                         const isSelected = selectedOpt === optIdx;
                         return (
                           <button
                             type="button"
                             key={optIdx}
+                            role="radio"
+                            aria-checked={isSelected}
                             onClick={() => handleSelectOption(q.id, optIdx)}
-                            className={`w-full text-left p-3 rounded-xl border transition-all text-xs flex items-start gap-3 min-h-[44px] ${
+                            className={`w-full text-left p-3 rounded-xl border transition-all text-xs flex items-start gap-3 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                               isSelected
                                 ? 'border-primary bg-primary/10 text-foreground font-medium ring-1 ring-primary/40'
                                 : 'border-border/50 bg-secondary/15 hover:bg-secondary/35 text-muted-foreground'

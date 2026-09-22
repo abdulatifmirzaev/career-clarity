@@ -173,8 +173,12 @@ export default function LevelingPage() {
                   max={20}
                   step={1}
                   value={yearsExp}
+                  aria-label="Years of professional experience"
+                  aria-valuemin={0}
+                  aria-valuemax={20}
+                  aria-valuenow={yearsExp}
                   onChange={(e) => setYearsExp(Number(e.target.value))}
-                  className="w-full accent-primary cursor-pointer h-2 bg-secondary rounded-lg appearance-none"
+                  className="w-full accent-primary cursor-pointer h-2 bg-secondary rounded-lg appearance-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </div>
 
@@ -199,7 +203,8 @@ export default function LevelingPage() {
                       type="button"
                       key={t}
                       onClick={() => setCurrentTitle(t)}
-                      className={`text-[11px] px-2 py-1 rounded-md border transition-all ${
+                      aria-pressed={currentTitle === t}
+                      className={`text-[11px] px-2.5 py-1.5 rounded-md border transition-all min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         currentTitle === t
                           ? 'border-primary bg-primary/10 text-primary font-medium'
                           : 'border-border/60 bg-secondary/30 text-muted-foreground hover:text-foreground'
@@ -227,7 +232,8 @@ export default function LevelingPage() {
                       type="button"
                       key={item.value}
                       onClick={() => setSystemDesignScore(item.value)}
-                      className={`w-full text-left p-2.5 rounded-xl border transition-all text-xs ${
+                      aria-pressed={systemDesignScore === item.value}
+                      className={`w-full text-left p-3 rounded-xl border transition-all text-xs min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         systemDesignScore === item.value
                           ? 'border-primary/80 bg-primary/10 text-foreground ring-1 ring-primary/30'
                           : 'border-border/50 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground'
@@ -263,7 +269,8 @@ export default function LevelingPage() {
                       type="button"
                       key={item.value}
                       onClick={() => setLeadershipScore(item.value)}
-                      className={`w-full text-left p-2.5 rounded-xl border transition-all text-xs ${
+                      aria-pressed={leadershipScore === item.value}
+                      className={`w-full text-left p-3 rounded-xl border transition-all text-xs min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         leadershipScore === item.value
                           ? 'border-primary/80 bg-primary/10 text-foreground ring-1 ring-primary/30'
                           : 'border-border/50 bg-secondary/20 hover:bg-secondary/40 text-muted-foreground'

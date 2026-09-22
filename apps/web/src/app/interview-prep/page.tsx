@@ -216,12 +216,19 @@ export default function InterviewPrepPage() {
           </div>
 
           {/* Level Order Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {/* Level Order Tabs */}
+          <div
+            role="tablist"
+            aria-label="Filter by Engineering Level"
+            className="flex items-center gap-1.5 overflow-x-auto pb-1"
+          >
             {LEVEL_TABS.map((tab) => (
               <button
                 key={tab.level}
+                role="tab"
+                aria-selected={selectedLevel === tab.level}
                 onClick={() => setSelectedLevel(tab.level)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all border min-h-[34px] ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all border min-h-[36px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   selectedLevel === tab.level
                     ? 'border-primary bg-primary text-primary-foreground font-semibold shadow-sm'
                     : 'border-border/50 bg-secondary/20 text-muted-foreground hover:text-foreground hover:bg-secondary/40'
@@ -233,12 +240,18 @@ export default function InterviewPrepPage() {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <div
+            role="group"
+            aria-label="Filter by Topic Category"
+            className="flex items-center gap-1.5 overflow-x-auto pb-1"
+          >
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
+                type="button"
+                aria-pressed={selectedCategory === cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-[11px] px-2.5 py-1 rounded-md border transition-all whitespace-nowrap ${
+                className={`text-[11px] px-2.5 py-1.5 rounded-md border transition-all whitespace-nowrap min-h-[32px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   selectedCategory === cat
                     ? 'border-primary/80 bg-primary/10 text-primary font-semibold'
                     : 'border-border/50 bg-background/40 text-muted-foreground hover:text-foreground'
@@ -285,7 +298,13 @@ export default function InterviewPrepPage() {
                         type="button"
                         onClick={() => handleToggleSolved(q)}
                         disabled={!isAuthenticated}
-                        className={`h-6 w-6 rounded-md flex items-center justify-center border transition-all shrink-0 ${
+                        aria-pressed={isSolved}
+                        aria-label={
+                          isSolved
+                            ? `Question ${idx + 1} marked solved. Click to mark unsolved`
+                            : `Mark question ${idx + 1} as solved`
+                        }
+                        className={`h-8 w-8 rounded-lg flex items-center justify-center border transition-all shrink-0 min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                           isSolved
                             ? 'bg-emerald-500 border-emerald-600 text-white'
                             : 'border-border/80 bg-background/60 text-muted-foreground hover:border-primary'

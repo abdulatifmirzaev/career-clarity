@@ -6,27 +6,42 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
+  hasHydrated: boolean;
+  hydrateAuth: () => void;
   setAuth: (user: UserProfile, accessToken: string, refreshToken: string) => void;
   clearAuth: () => void;
   updateUser: (data: Partial<UserProfile>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => {
-  // Initialize from client storage if available
-  const initialUser =
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('career_clarity_user') || 'null')
-      : null;
-  const initialAccess =
-    typeof window !== 'undefined' ? localStorage.getItem('career_clarity_access_token') : null;
-  const initialRefresh =
-    typeof window !== 'undefined' ? localStorage.getItem('career_clarity_refresh_token') : null;
-
   return {
-    user: initialUser,
-    accessToken: initialAccess,
-    refreshToken: initialRefresh,
-    isAuthenticated: !!initialAccess,
+    user: null,
+    accessToken: null,
+    refreshToken: null,
+    isAuthenticated: false,
+    hasHydrated: false,
+
+    hydrateAuth: () => {
+      if (typeof window === 'undefined') return;
+
+      try {
+        const storedUser = localStorage.getItem('career_clarity_user');
+        const storedAccess = localStorage.getItem('career_clarity_access_token');
+        const storedRefresh = localStorage.getItem('career_clarity_refresh_token');
+
+        const user: UserProfile | null = storedUser ? JSON.parse(storedUser) : null;
+
+        set({
+          user,
+          accessToken: storedAccess,
+          refreshToken: storedRefresh,
+          isAuthenticated: !!storedAccess,
+          hasHydrated: true,
+        });
+      } catch {
+        set({ hasHydrated: true });
+      }
+    },
 
     setAuth: (user, accessToken, refreshToken) => {
       if (typeof window !== 'undefined') {
@@ -39,6 +54,7 @@ export const useAuthStore = create<AuthState>((set) => {
         accessToken,
         refreshToken,
         isAuthenticated: true,
+        hasHydrated: true,
       });
     },
 
@@ -53,6 +69,7 @@ export const useAuthStore = create<AuthState>((set) => {
         accessToken: null,
         refreshToken: null,
         isAuthenticated: false,
+        hasHydrated: true,
       });
     },
 

@@ -1,29 +1,77 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import * as React from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { Header } from './header';
 import { MobileNav } from './mobile-nav';
 import { Sidebar } from './sidebar';
+import { useAuthStore } from '@/stores/auth-store';
+
+const PROTECTED_ROUTES = ['/dashboard', '/assessment'];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, hasHydrated, hydrateAuth } = useAuthStore();
+
+  // Hydrate auth store on client mount
+  React.useEffect(() => {
+    hydrateAuth();
+  }, [hydrateAuth]);
+
+  // Auth guard: redirect unauthenticated users on protected pages
+  React.useEffect(() => {
+    if (!hasHydrated) return;
+
+    const isProtected = PROTECTED_ROUTES.some(
+      (route) => pathname === route || pathname.startsWith(`${route}/`),
+    );
+
+    if (isProtected && !isAuthenticated) {
+      router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+    }
+  }, [hasHydrated, isAuthenticated, pathname, router]);
 
   const isStandalonePage =
     pathname === '/' || pathname.startsWith('/auth') || pathname.startsWith('/onboarding');
 
   if (isStandalonePage) {
-    return <div className="min-h-screen flex flex-col">{children}</div>;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground"
+        >
+          Skip to main content
+        </a>
+        <main id="main-content" className="flex-1">
+          {children}
+        </main>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
+      {/* Accessibility Skip Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:m-2"
+      >
+        Skip to main content
+      </a>
+
       {/* Desktop Persistent Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 pb-16 md:pb-0">
         <Header />
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto animate-in fade-in-50 duration-300">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto animate-in fade-in-50 duration-300 outline-none"
+        >
           {children}
         </main>
       </div>

@@ -134,7 +134,8 @@ function CustomSkillNode({ data }: NodeProps<Node<CustomNodeData>>) {
         <button
           type="button"
           onClick={cycleStatus}
-          className={`text-[10px] font-medium px-2 py-1 rounded-md border transition-all flex items-center gap-1 ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} hover:opacity-80`}
+          aria-label={`Current status: ${statusStyle.label}. Click to cycle status for ${name}`}
+          className={`text-[10px] font-medium px-2 py-1 rounded-md border transition-all flex items-center gap-1 ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
         >
           {status === 'mastered' && <CheckCircle2 className="h-2.5 w-2.5" />}
           {status === 'in_progress' && <RotateCw className="h-2.5 w-2.5" />}
@@ -165,14 +166,37 @@ export default function RoadmapPage() {
     queryFn: () => apiClient<RoadmapNodeDto[]>(`/roadmap/${selectedRole}`),
   });
 
-  // Mutation to update skill progress
+  // Mutation to update skill progress with optimistic updates
   const progressMutation = useMutation({
     mutationFn: ({ skillId, status }: { skillId: string; status: SkillProgressStatus }) =>
       apiClient(`/roadmap/skills/${skillId}/progress`, {
         method: 'PATCH',
         body: { status },
       }),
-    onSuccess: () => {
+    onMutate: async ({ skillId, status }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['roadmap', selectedRole] });
+
+      // Snapshot previous state
+      const previousRoadmap = queryClient.getQueryData<RoadmapNodeDto[]>(['roadmap', selectedRole]);
+
+      // Optimistically update
+      if (previousRoadmap) {
+        queryClient.setQueryData<RoadmapNodeDto[]>(
+          ['roadmap', selectedRole],
+          previousRoadmap.map((node) => (node.skillId === skillId ? { ...node, status } : node)),
+        );
+      }
+
+      return { previousRoadmap };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousRoadmap) {
+        queryClient.setQueryData(['roadmap', selectedRole], context.previousRoadmap);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['roadmap', selectedRole] });
       queryClient.invalidateQueries({ queryKey: ['roadmap-user-progress'] });
       queryClient.invalidateQueries({ queryKey: ['latest-assessment'] });
@@ -312,7 +336,9 @@ export default function RoadmapPage() {
             <button
               type="button"
               onClick={() => setViewMode('graph')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              aria-pressed={viewMode === 'graph'}
+              aria-label="Switch to Interactive Graph view"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[36px] ${
                 viewMode === 'graph'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -324,7 +350,9 @@ export default function RoadmapPage() {
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              aria-pressed={viewMode === 'list'}
+              aria-label="Switch to Timeline list view"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[36px] ${
                 viewMode === 'list'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -340,12 +368,18 @@ export default function RoadmapPage() {
       {/* Role Selector & Filter Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Role Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div
+          role="tablist"
+          aria-label="Engineering Disciplines"
+          className="flex items-center gap-2 overflow-x-auto pb-1"
+        >
           {ROLES.map((role) => (
             <button
               key={role.id}
+              role="tab"
+              aria-selected={selectedRole === role.id}
               onClick={() => setSelectedRole(role.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border min-h-[40px] ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 selectedRole === role.id
                   ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                   : 'border-border/60 bg-card/40 text-muted-foreground hover:text-foreground hover:bg-secondary/40'
@@ -483,6 +517,7 @@ export default function RoadmapPage() {
                               <span className="text-[11px] text-muted-foreground">Status</span>
                               <button
                                 type="button"
+                                aria-label={`Current status: ${statusStyle.label}. Click to cycle status for ${node.skill.name}`}
                                 onClick={() => {
                                   const nextStatus: Record<
                                     SkillProgressStatus,
@@ -497,7 +532,7 @@ export default function RoadmapPage() {
                                     nextStatus[node.status || 'not_started'],
                                   );
                                 }}
-                                className={`text-[11px] font-medium px-2.5 py-1 rounded-md border min-h-[32px] flex items-center gap-1.5 transition-all ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
+                                className={`text-[11px] font-medium px-3 py-1.5 rounded-md border min-h-[44px] flex items-center gap-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}
                               >
                                 {node.status === 'mastered' && <CheckCircle2 className="h-3 w-3" />}
                                 {node.status === 'in_progress' && <RotateCw className="h-3 w-3" />}
