@@ -1,8 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "pnpm --filter @career-clarity/web build",
-  "installCommand": "pnpm install",
   "headers": [
     {
       "source": "/(.*)",

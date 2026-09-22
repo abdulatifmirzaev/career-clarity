@@ -1,6 +1,17 @@
 import { ApiResponse } from '@career-clarity/shared-types';
 
-const API_BASE_URL = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3001/api';
+function getBaseUrl(): string {
+  if (process.env['NEXT_PUBLIC_API_URL']) {
+    return process.env['NEXT_PUBLIC_API_URL'].replace(/\/$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+  if (process.env['VERCEL_URL']) {
+    return `https://${process.env['VERCEL_URL']}/api`;
+  }
+  return 'http://localhost:3000/api';
+}
 
 export class ApiError extends Error {
   statusCode: number;
@@ -49,8 +60,9 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const baseUrl = getBaseUrl();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${API_BASE_URL}${cleanEndpoint}`;
+  const url = `${baseUrl}${cleanEndpoint}`;
 
   let requestBody: BodyInit | null | undefined;
   if (options.body !== undefined && options.body !== null) {
@@ -96,7 +108,7 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions =
       isRefreshing = true;
 
       try {
-        const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        const refreshResponse = await fetch(`${baseUrl}/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken }),
