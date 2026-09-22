@@ -3,10 +3,19 @@ import { generateAuthTokens, jsonError, jsonSuccess, serverStore } from '@/lib/s
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, name, yearsExp, primaryStack } = body;
+    const { email, password, name, yearsExp, primaryStack, verificationCode } = body;
 
     if (!email || !password) {
       return jsonError('Email and password are required', 400);
+    }
+
+    if (!verificationCode) {
+      return jsonError('6 haneli e-posta doğrulama kodu zorunludur.', 400);
+    }
+
+    const isCodeValid = serverStore.verifyCode(email, verificationCode);
+    if (!isCodeValid) {
+      return jsonError('Girilen 6 haneli doğrulama kodu hatalı veya süresi dolmuş.', 400);
     }
 
     const existingUser = serverStore.findUserByEmail(email);

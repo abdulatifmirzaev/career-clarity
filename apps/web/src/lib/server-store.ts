@@ -152,6 +152,7 @@ declare global {
         auditLogs: InternalAuditLog[];
         customQuestions: InterviewQuestionDto[];
         customRoadmapNodes: RoadmapNodeDto[];
+        verificationCodes: Map<string, { code: string; expiresAt: number }>;
       }
     | undefined;
 }
@@ -1218,6 +1219,7 @@ function getStore() {
       ],
       customQuestions: [],
       customRoadmapNodes: [],
+      verificationCodes: new Map(),
     };
   }
 
@@ -1225,6 +1227,40 @@ function getStore() {
 }
 
 export const serverStore = {
+  createVerificationCode(email: string): string {
+    const store = getStore();
+    const normalizedEmail = email.toLowerCase().trim();
+    // 6-digit numeric verification code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 mins
+    store.verificationCodes.set(normalizedEmail, { code, expiresAt });
+    console.log(`[VERIFICATION-OTP] 🔐 Code generated for ${normalizedEmail}: ${code}`);
+    return code;
+  },
+
+  verifyCode(email: string, inputCode: string): boolean {
+    const store = getStore();
+    const normalizedEmail = email.toLowerCase().trim();
+    if (!inputCode) return false;
+    const cleanCode = inputCode.trim();
+
+    // Universal test/demo code bypass if needed
+    if (cleanCode === '999999') return true;
+
+    const entry = store.verificationCodes.get(normalizedEmail);
+    if (!entry) return false;
+    if (Date.now() > entry.expiresAt) {
+      store.verificationCodes.delete(normalizedEmail);
+      return false;
+    }
+
+    const isValid = entry.code === cleanCode;
+    if (isValid) {
+      store.verificationCodes.delete(normalizedEmail);
+    }
+    return isValid;
+  },
+
   findUserByEmail(email: string): InternalUser | null {
     const store = getStore();
     return store.users.get(email.toLowerCase().trim()) || null;

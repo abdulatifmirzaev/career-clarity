@@ -32,6 +32,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [hasHydrated, isAuthenticated, pathname, router]);
 
+  // Completely isolate Admin console from standard web shell
+  if (pathname.startsWith('/admin')) {
+    return <>{children}</>;
+  }
+
   const isStandalonePage =
     pathname === '/' || pathname.startsWith('/auth') || pathname.startsWith('/onboarding');
 

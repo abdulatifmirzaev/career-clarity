@@ -297,7 +297,7 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Role Badge & Button */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${
@@ -320,7 +320,7 @@ export default function AdminUsersPage() {
                             <button
                               onClick={() => handleRoleToggle(u)}
                               disabled={isActing}
-                              className="text-[10px] text-cyan-400 hover:underline disabled:opacity-50"
+                              className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-cyan-400 border border-slate-700/60 transition-colors disabled:opacity-50"
                               title="Rolü Değiştir"
                             >
                               Değiştir
@@ -330,11 +330,11 @@ export default function AdminUsersPage() {
                       </td>
 
                       {/* Status */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <button
                           onClick={() => handleStatusToggle(u)}
                           disabled={isOwner || isActing}
-                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium transition-all ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
                             u.status === 'ACTIVE'
                               ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40 hover:bg-emerald-900/50'
                               : 'bg-red-950/60 text-red-300 border border-red-800/40 hover:bg-red-900/50'

@@ -9,7 +9,6 @@ import {
   HelpCircle,
   ShieldCheck,
   LogOut,
-  ExternalLink,
   Activity,
   Menu,
   X,
@@ -20,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // If we are on the login page, don't show the admin sidebar/navigation
   if (pathname === '/admin/login') {
@@ -139,39 +139,73 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* User Footer & Actions */}
         <div className="p-4 border-t border-slate-800 space-y-3">
-          <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">
-            <div className="flex items-center justify-between mb-1">
+          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+            <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-semibold tracking-wider uppercase text-cyan-400">
-                Yetkili Yönetici
+                Süper Yönetici
               </span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60">
-                SUPERADMIN
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono font-bold">
+                ROOT
               </span>
             </div>
-            <p className="text-xs font-medium text-white truncate">Abdulatif Mirzaev</p>
+            <p className="text-xs font-semibold text-white truncate">Abdulatif Mirzaev</p>
             <p className="text-[11px] text-slate-400 truncate">abdulatif.mirzaev2004@gmail.com</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              target="_blank"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 transition-colors"
-            >
-              <span>Siteyi Gör</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-center p-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-900/30 transition-colors"
-              title="Çıkış Yap"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium text-red-400 hover:text-red-300 bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 hover:border-red-800/50 transition-all"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Yönetici Oturumunu Kapat</span>
+          </button>
         </div>
       </aside>
+
+      {/* Admin Sign Out Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
+                <LogOut className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">
+                  Yönetici Oturumu Kapatılsın mı?
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Admin konsol erişiminiz sonlandırılacaktır.
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Panelden çıkış yaptığınızda tekrar erişebilmek için e-posta ve şifrenizle giriş
+              yapmanız gerekecektir.
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="px-3.5 py-2 rounded-xl text-xs text-slate-400 hover:text-white bg-slate-800/60 transition-colors"
+              >
+                Vazgeç
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="px-4 py-2 rounded-xl text-xs font-medium bg-red-600 hover:bg-red-500 text-white transition-colors flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Evet, Güvenli Çıkış Yap</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto overflow-x-auto">

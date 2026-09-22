@@ -89,16 +89,19 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <Link href="/onboarding">
-            <Button variant="outline" size="sm" className="min-h-[40px] text-xs">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 shrink-0 pt-2 md:pt-0">
+          <Link href="/onboarding" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[40px] text-xs">
               <FileCheck2 className="h-3.5 w-3.5" />
-              Retake Assessment
+              <span>Yeniden Test Yap</span>
             </Button>
           </Link>
-          <Link href="/roadmap">
-            <Button size="sm" className="min-h-[40px] text-xs">
-              <span>View Skill Tree</span>
+          <Link href="/roadmap" className="w-full sm:w-auto">
+            <Button
+              size="sm"
+              className="w-full sm:w-auto min-h-[40px] text-xs bg-primary text-primary-foreground"
+            >
+              <span>Yol Haritasını Gör</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Link>

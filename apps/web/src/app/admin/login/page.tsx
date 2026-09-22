@@ -139,13 +139,9 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 pt-4 border-t border-slate-800 text-center">
-            <a
-              href="/"
-              className="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center gap-1"
-            >
-              ← Kullanıcı uygulamasına dön
-            </a>
+          <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+            <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+            <span>İzole Yönetici Ağı &bull; Güvenli Oturum</span>
           </div>
         </div>
 

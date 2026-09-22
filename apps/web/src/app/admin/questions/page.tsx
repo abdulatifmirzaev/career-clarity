@@ -233,7 +233,7 @@ export default function AdminQuestionsPage() {
                 <button
                   onClick={() => handleDelete(q.id)}
                   disabled={actionLoading === q.id}
-                  className="self-end sm:self-auto p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/40 transition-colors"
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-red-300 bg-slate-950/60 hover:bg-red-950/50 border border-slate-800 hover:border-red-900/50 transition-colors shrink-0"
                   title="Soruyu Sil"
                 >
                   <Trash2 className="w-4 h-4" />
