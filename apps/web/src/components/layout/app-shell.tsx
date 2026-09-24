@@ -1,36 +1,20 @@
 'use client';
 
 import * as React from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Header } from './header';
 import { MobileNav } from './mobile-nav';
 import { Sidebar } from './sidebar';
 import { useAuthStore } from '@/stores/auth-store';
 
-const PROTECTED_ROUTES = ['/dashboard', '/assessment'];
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { isAuthenticated, hasHydrated, hydrateAuth } = useAuthStore();
+  const { hydrateAuth } = useAuthStore();
 
   // Hydrate auth store on client mount
   React.useEffect(() => {
     hydrateAuth();
   }, [hydrateAuth]);
-
-  // Auth guard: redirect unauthenticated users on protected pages
-  React.useEffect(() => {
-    if (!hasHydrated) return;
-
-    const isProtected = PROTECTED_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(`${route}/`),
-    );
-
-    if (isProtected && !isAuthenticated) {
-      router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
-    }
-  }, [hasHydrated, isAuthenticated, pathname, router]);
 
   // Completely isolate Admin console from standard web shell
   if (pathname.startsWith('/admin')) {

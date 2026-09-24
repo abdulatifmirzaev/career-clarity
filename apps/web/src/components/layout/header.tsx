@@ -45,7 +45,7 @@ export function Header() {
     clearAuth();
     setShowConfirmModal(false);
     setMenuOpen(false);
-    router.push('/auth/login');
+    router.push('/dashboard');
   };
 
   return (
