@@ -3,16 +3,8 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Compass,
-  FileCheck2,
-  HelpCircle,
-  LayoutDashboard,
-  Layers,
-  User as UserIcon,
-} from 'lucide-react';
+import { Compass, FileCheck2, HelpCircle, LayoutDashboard, Layers, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/stores/auth-store';
 
 export const navItems = [
   {
@@ -44,7 +36,6 @@ export const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuthStore();
 
   return (
     <aside className="hidden md:flex flex-col w-64 border-r border-border/40 bg-card/40 backdrop-blur-xl h-screen sticky top-0 z-30 select-none">
@@ -89,37 +80,15 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Footer Section (Clean Information Display) */}
+      {/* Live Tool Status Badge */}
       <div className="p-4 border-t border-border/40 bg-card/20">
-        {isAuthenticated && user ? (
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="h-9 w-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-semibold text-xs shrink-0">
-              {user.name ? user.name.slice(0, 2).toUpperCase() : 'ME'}
-            </div>
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-semibold truncate text-foreground">
-                {user.name || 'Verified Engineer'}
-              </span>
-              <span className="text-[11px] text-muted-foreground truncate">{user.email}</span>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <Link
-              href="/auth/login"
-              className="w-full flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground py-2 border border-border/60 rounded-md min-h-[44px]"
-            >
-              <UserIcon className="h-3.5 w-3.5" />
-              Sign In
-            </Link>
-            <Link
-              href="/onboarding"
-              className="w-full flex items-center justify-center text-xs font-medium bg-primary text-primary-foreground py-2 rounded-md hover:bg-primary/90 min-h-[44px]"
-            >
-              Start Assessment
-            </Link>
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="font-mono text-[11px] font-medium text-slate-300 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            Instant Engineering Tool
+          </span>
+        </div>
       </div>
     </aside>
   );
