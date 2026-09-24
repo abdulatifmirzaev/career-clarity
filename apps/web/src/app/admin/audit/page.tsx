@@ -25,11 +25,11 @@ export default function AdminAuditPage() {
       const res = await fetch('/api/admin/audit-logs');
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Denetim kayıtları alınamadı');
+        throw new Error(data.message || 'Failed to fetch security audit logs');
       }
       setLogs(data.data.logs || []);
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : 'Hata oluştu');
+      setErrorMessage(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -46,10 +46,10 @@ export default function AdminAuditPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <Activity className="w-6 h-6 text-purple-400" />
-            Sistem & Güvenlik Denetim Günlüğü
+            System & Security Audit Logs
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Admin operasyonları, veri değişiklikleri ve oturum açma kayıtları
+            Audit trial of administrator actions, data modifications, and security events
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default function AdminAuditPage() {
           className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:text-white"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Yenile</span>
+          <span>Refresh</span>
         </button>
       </div>
 
@@ -76,11 +76,11 @@ export default function AdminAuditPage() {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
               <tr>
-                <th className="px-5 py-3.5">Zaman</th>
-                <th className="px-4 py-3.5">Yetkili</th>
-                <th className="px-4 py-3.5">Eylem (Action)</th>
-                <th className="px-4 py-3.5">Hedef Türü</th>
-                <th className="px-5 py-3.5">Ayrıntılar</th>
+                <th className="px-5 py-3.5">Timestamp</th>
+                <th className="px-4 py-3.5">Administrator</th>
+                <th className="px-4 py-3.5">Action</th>
+                <th className="px-4 py-3.5">Target Scope</th>
+                <th className="px-5 py-3.5">Details Payload</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -88,13 +88,13 @@ export default function AdminAuditPage() {
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-cyan-500" />
-                    Kayıtlar yükleniyor...
+                    Fetching security audit trail...
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-5 py-8 text-center text-slate-500">
-                    Henüz kayıt edilmiş denetim eylemi bulunmuyor.
+                    No security audit logs recorded yet.
                   </td>
                 </tr>
               ) : (
@@ -102,7 +102,7 @@ export default function AdminAuditPage() {
                   <tr key={log.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="px-5 py-3.5 text-slate-400 flex items-center gap-1.5 whitespace-nowrap">
                       <Clock className="w-3.5 h-3.5 text-slate-500" />
-                      {new Date(log.createdAt).toLocaleString('tr-TR', {
+                      {new Date(log.createdAt).toLocaleString('en-US', {
                         day: '2-digit',
                         month: 'short',
                         hour: '2-digit',

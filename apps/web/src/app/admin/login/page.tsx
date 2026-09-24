@@ -26,10 +26,9 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Yetkilendirme başarısız oldu.');
+        throw new Error(data.message || 'Authentication failed.');
       }
 
-      // Store token in localStorage for direct API calls if needed
       if (data.data?.accessToken) {
         localStorage.setItem('career_admin_token', data.data.accessToken);
         localStorage.setItem('career_admin_user', JSON.stringify(data.data.user));
@@ -38,7 +37,7 @@ export default function AdminLoginPage() {
       router.push('/admin');
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Giriş yapılamadı.');
+      setError(err instanceof Error ? err.message : 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -57,17 +56,17 @@ export default function AdminLoginPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">
             Career Clarity Console
           </h1>
-          <p className="text-sm text-slate-400 mt-1">Yönetim & Veritabanı Kontrol Merkezi</p>
+          <p className="text-sm text-slate-400 mt-1">Administrative & Database Control Center</p>
         </div>
 
         {/* Login Box */}
         <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-black/50">
           <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
             <div>
-              <h2 className="text-base font-semibold text-white">Yönetici Girişi</h2>
-              <p className="text-xs text-slate-400">Yalnızca yetkili hesaplar erişebilir</p>
+              <h2 className="text-base font-semibold text-white">Admin Authentication</h2>
+              <p className="text-xs text-slate-400">Restricted to authorized credentials</p>
             </div>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono">
               Superadmin Mode
             </span>
           </div>
@@ -81,9 +80,7 @@ export default function AdminLoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Admin E-posta
-              </label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Admin Email</label>
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
                 <input
@@ -98,9 +95,7 @@ export default function AdminLoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1.5">
-                Giriş Şifresi
-              </label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Password</label>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
                 <input
@@ -113,7 +108,7 @@ export default function AdminLoginPage() {
                 />
               </div>
               <p className="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1">
-                <span>Varsayılan şifre:</span>
+                <span>Default passcode:</span>
                 <code className="text-cyan-300 font-mono bg-cyan-950/50 px-1 py-0.5 rounded border border-cyan-800/40">
                   Admin2026!Clarity
                 </code>
@@ -128,11 +123,11 @@ export default function AdminLoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Doğrulanıyor...</span>
+                  <span>Verifying Credentials...</span>
                 </>
               ) : (
                 <>
-                  <span>Panele Giriş Yap</span>
+                  <span>Sign In to Console</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -141,12 +136,12 @@ export default function AdminLoginPage() {
 
           <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
             <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-            <span>İzole Yönetici Ağı &bull; Güvenli Oturum</span>
+            <span>Isolated Administrative Subdomain &bull; Secure Session</span>
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6">
-          Career Clarity &copy; 2026 &bull; Subdomain: admin.career-clarity-one.vercel.app
+        <p className="text-center text-xs text-slate-400 mt-6 font-mono">
+          Career Clarity &copy; 2026 &bull; admin.career-clarity-one.vercel.app
         </p>
       </div>
     </div>

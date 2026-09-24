@@ -50,11 +50,11 @@ export default function AdminUsersPage() {
       const res = await fetch('/api/admin/users');
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Kullanıcılar alınamadı');
+        throw new Error(data.message || 'Failed to fetch users');
       }
       setUsers(data.data.users || []);
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : 'Hata oluştu');
+      setErrorMessage(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -78,7 +78,7 @@ export default function AdminUsersPage() {
       if (!res.ok || !data.success) throw new Error(data.message);
       await fetchUsers();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Rol güncellenemedi');
+      alert(err instanceof Error ? err.message : 'Failed to update user role');
     } finally {
       setActionLoading(null);
     }
@@ -98,7 +98,7 @@ export default function AdminUsersPage() {
       if (!res.ok || !data.success) throw new Error(data.message);
       await fetchUsers();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Durum güncellenemedi');
+      alert(err instanceof Error ? err.message : 'Failed to update account status');
     } finally {
       setActionLoading(null);
     }
@@ -106,12 +106,14 @@ export default function AdminUsersPage() {
 
   const handleDeleteUser = async (user: SafeUser) => {
     if (user.email === 'abdulatif.mirzaev2004@gmail.com') {
-      alert('Ana süper yönetici hesabı silinemez.');
+      alert('Primary superadmin account cannot be deleted.');
       return;
     }
 
     if (
-      !confirm(`"${user.email}" kullanıcısını ve tüm verilerini silmek istediğinize emin misiniz?`)
+      !confirm(
+        `Are you sure you want to permanently delete user "${user.email}" and all associated data?`,
+      )
     ) {
       return;
     }
@@ -125,7 +127,7 @@ export default function AdminUsersPage() {
       if (!res.ok || !data.success) throw new Error(data.message);
       await fetchUsers();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Kullanıcı silinemedi');
+      alert(err instanceof Error ? err.message : 'Failed to delete user');
     } finally {
       setActionLoading(null);
     }
@@ -155,7 +157,7 @@ export default function AdminUsersPage() {
       setNewPassword('');
       await fetchUsers();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Kullanıcı oluşturulamadı');
+      alert(err instanceof Error ? err.message : 'Failed to create user');
     }
   };
 
@@ -180,10 +182,10 @@ export default function AdminUsersPage() {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
             <Users className="w-6 h-6 text-cyan-400" />
-            Kullanıcı & Hesap Yönetimi
+            User & Account Management
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Kayıtlı hesapları görüntüleyin, rolleri düzenleyin ve hesap erişimlerini denetleyin
+            View registered user accounts, manage security roles, and audit access permissions
           </p>
         </div>
 
@@ -192,7 +194,7 @@ export default function AdminUsersPage() {
             onClick={fetchUsers}
             disabled={loading}
             className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
-            title="Yenile"
+            title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -202,7 +204,7 @@ export default function AdminUsersPage() {
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium bg-cyan-600 hover:bg-cyan-500 text-white shadow-sm shadow-cyan-600/30 transition-all"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Yeni Kullanıcı Ekle</span>
+            <span>Add New User</span>
           </button>
         </div>
       </div>
@@ -220,7 +222,7 @@ export default function AdminUsersPage() {
           <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
           <input
             type="text"
-            placeholder="E-posta, isim veya teknoloji yığını ile ara..."
+            placeholder="Search by email, name, or primary stack..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
@@ -228,15 +230,15 @@ export default function AdminUsersPage() {
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-400 hidden sm:inline">Filtre:</span>
+          <span className="text-xs text-slate-400 hidden sm:inline">Filter:</span>
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
           >
-            <option value="ALL">Tüm Roller ({users.length})</option>
-            <option value="ADMIN">Yöneticiler</option>
-            <option value="USER">Standart Kullanıcılar</option>
+            <option value="ALL">All Roles ({users.length})</option>
+            <option value="ADMIN">Administrators</option>
+            <option value="USER">Standard Users</option>
           </select>
         </div>
       </div>
@@ -247,12 +249,12 @@ export default function AdminUsersPage() {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
               <tr>
-                <th className="px-5 py-3.5">Kullanıcı / E-posta</th>
-                <th className="px-4 py-3.5">Rol</th>
-                <th className="px-4 py-3.5">Durum</th>
-                <th className="px-4 py-3.5">Deneyim & Stack</th>
-                <th className="px-4 py-3.5">Kayıt Tarihi</th>
-                <th className="px-5 py-3.5 text-right">Eylemler</th>
+                <th className="px-5 py-3.5">User / Email</th>
+                <th className="px-4 py-3.5">Role</th>
+                <th className="px-4 py-3.5">Status</th>
+                <th className="px-4 py-3.5">Experience & Stack</th>
+                <th className="px-4 py-3.5">Registered Date</th>
+                <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -260,13 +262,13 @@ export default function AdminUsersPage() {
                 <tr>
                   <td colSpan={6} className="px-5 py-10 text-center text-slate-500">
                     <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-cyan-500" />
-                    Kullanıcı veritabanı taranıyor...
+                    Scanning user database...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-5 py-8 text-center text-slate-500">
-                    Arama kriterlerine uygun kullanıcı bulunamadı.
+                    No registered users matching your search parameters were found.
                   </td>
                 </tr>
               ) : (
@@ -284,10 +286,10 @@ export default function AdminUsersPage() {
                           </div>
                           <div>
                             <div className="font-medium text-white flex items-center gap-1.5">
-                              <span>{u.name || 'İsimsiz Kullanıcı'}</span>
+                              <span>{u.name || 'Unnamed User'}</span>
                               {isOwner && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 border border-amber-800/60 font-medium">
-                                  Sahip
+                                  Owner
                                 </span>
                               )}
                             </div>
@@ -321,9 +323,9 @@ export default function AdminUsersPage() {
                               onClick={() => handleRoleToggle(u)}
                               disabled={isActing}
                               className="text-[11px] font-medium px-2 py-0.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-cyan-400 border border-slate-700/60 transition-colors disabled:opacity-50"
-                              title="Rolü Değiştir"
+                              title="Toggle Role"
                             >
-                              Değiştir
+                              Toggle
                             </button>
                           )}
                         </div>
@@ -339,30 +341,32 @@ export default function AdminUsersPage() {
                               ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/40 hover:bg-emerald-900/50'
                               : 'bg-red-950/60 text-red-300 border border-red-800/40 hover:bg-red-900/50'
                           } ${isOwner ? 'cursor-default' : 'cursor-pointer'}`}
-                          title={isOwner ? 'Korumalı Hesap' : 'Tıklayarak durumu değiştirin'}
+                          title={
+                            isOwner ? 'Protected Owner Account' : 'Click to toggle account status'
+                          }
                         >
                           {u.status === 'ACTIVE' ? (
                             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                           ) : (
                             <XCircle className="w-3 h-3 text-red-400" />
                           )}
-                          <span>{u.status === 'ACTIVE' ? 'Aktif' : 'Askıda'}</span>
+                          <span>{u.status === 'ACTIVE' ? 'Active' : 'Suspended'}</span>
                         </button>
                       </td>
 
                       {/* Stack & Exp */}
                       <td className="px-4 py-4">
                         <div className="space-y-0.5">
-                          <p className="text-white text-xs">{u.yearsExp ?? 0} Yıl Deneyim</p>
+                          <p className="text-white text-xs">{u.yearsExp ?? 0} Yrs Experience</p>
                           <p className="text-slate-500 text-[11px] max-w-xs truncate">
-                            {u.primaryStack || 'Belirtilmedi'}
+                            {u.primaryStack || 'Not specified'}
                           </p>
                         </div>
                       </td>
 
                       {/* Created At */}
                       <td className="px-4 py-4 text-slate-400 text-[11px]">
-                        {new Date(u.createdAt).toLocaleDateString('tr-TR', {
+                        {new Date(u.createdAt).toLocaleDateString('en-US', {
                           day: '2-digit',
                           month: 'short',
                           year: 'numeric',
@@ -372,13 +376,15 @@ export default function AdminUsersPage() {
                       {/* Actions */}
                       <td className="px-5 py-4 text-right">
                         {isOwner ? (
-                          <span className="text-[11px] text-slate-500 italic">Dokunulamaz</span>
+                          <span className="text-[11px] text-slate-500 italic font-mono">
+                            Protected
+                          </span>
                         ) : (
                           <button
                             onClick={() => handleDeleteUser(u)}
                             disabled={isActing}
                             className="p-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-950/50 border border-transparent hover:border-red-900/50 transition-colors disabled:opacity-50"
-                            title="Kullanıcıyı Sil"
+                            title="Delete User"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -397,37 +403,37 @@ export default function AdminUsersPage() {
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
-            <h2 className="text-base font-bold text-white mb-1">Yeni Kullanıcı Oluştur</h2>
+            <h2 className="text-base font-bold text-white mb-1">Create New User</h2>
             <p className="text-xs text-slate-400 mb-4">
-              Veritabanına manuel kullanıcı veya yeni bir yönetici ekleyin
+              Provision a manual user or new administrator account into the system
             </p>
 
             <form onSubmit={handleCreateUser} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">E-posta Adresi *</label>
+                <label className="block text-slate-300 font-medium mb-1">Email Address *</label>
                 <input
                   type="email"
                   required
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  placeholder="ornek@careerclarity.dev"
+                  placeholder="user@careerclarity.dev"
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Ad Soyad</label>
+                <label className="block text-slate-300 font-medium mb-1">Full Name</label>
                 <input
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Ahmet Yılmaz"
+                  placeholder="John Doe"
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Başlangıç Şifresi *</label>
+                <label className="block text-slate-300 font-medium mb-1">Initial Password *</label>
                 <input
                   type="password"
                   required
@@ -440,19 +446,21 @@ export default function AdminUsersPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Hesap Rolü</label>
+                  <label className="block text-slate-300 font-medium mb-1">Account Role</label>
                   <select
                     value={newRole}
                     onChange={(e) => setNewRole(e.target.value as 'USER' | 'ADMIN')}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-500"
                   >
-                    <option value="USER">Standart Kullanıcı</option>
-                    <option value="ADMIN">Yönetici (Admin)</option>
+                    <option value="USER">Standard User</option>
+                    <option value="ADMIN">Administrator (Admin)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">Deneyim (Yıl)</label>
+                  <label className="block text-slate-300 font-medium mb-1">
+                    Experience (Years)
+                  </label>
                   <input
                     type="number"
                     min={0}
@@ -465,7 +473,9 @@ export default function AdminUsersPage() {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Teknoloji Yığını</label>
+                <label className="block text-slate-300 font-medium mb-1">
+                  Primary Technology Stack
+                </label>
                 <input
                   type="text"
                   value={newStack}
@@ -481,13 +491,13 @@ export default function AdminUsersPage() {
                   onClick={() => setShowAddModal(false)}
                   className="px-3.5 py-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 transition-colors"
                 >
-                  İptal
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-medium transition-colors"
                 >
-                  Kullanıcıyı Kaydet
+                  Save User
                 </button>
               </div>
             </form>

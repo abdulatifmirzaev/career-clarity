@@ -93,7 +93,7 @@ export default function DashboardPage() {
           <Link href="/onboarding" className="w-full sm:w-auto">
             <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[40px] text-xs">
               <FileCheck2 className="h-3.5 w-3.5" />
-              <span>Yeniden Test Yap</span>
+              <span>Retake Diagnostic</span>
             </Button>
           </Link>
           <Link href="/roadmap" className="w-full sm:w-auto">
@@ -101,7 +101,7 @@ export default function DashboardPage() {
               size="sm"
               className="w-full sm:w-auto min-h-[40px] text-xs bg-primary text-primary-foreground"
             >
-              <span>Yol Haritasını Gör</span>
+              <span>View Roadmap</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Link>

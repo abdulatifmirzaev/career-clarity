@@ -73,7 +73,7 @@ export function Header() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 p-1.5 rounded-full hover:bg-secondary/60 border border-transparent hover:border-border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 aria-expanded={menuOpen}
-                aria-label="Kullanıcı Profil Menüsü"
+                aria-label="User Profile Menu"
               >
                 <div className="h-8 w-8 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-semibold text-xs shadow-sm">
                   {user.name ? user.name.slice(0, 2).toUpperCase() : 'ME'}
@@ -85,22 +85,22 @@ export function Header() {
                 />
               </button>
 
-              {/* Profile Dropdown Menu */}
+              {/* Ultra-Professional Profile Dropdown Menu */}
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-card border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-3 py-2 border-b border-border/50">
+                <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-card border border-border/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2.5 border-b border-border/50">
                     <p className="text-xs font-semibold text-foreground truncate">
-                      {user.name || 'Yazılım Mühendisi'}
+                      {user.name || 'Software Engineer'}
                     </p>
                     <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
-                    <div className="mt-1.5 flex items-center gap-1.5">
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-                        {user.yearsExp ? `${user.yearsExp} Yıl Deneyim` : 'Engineer'}
+                    <div className="mt-2 flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-semibold">
+                        {user.yearsExp ? `${user.yearsExp} YOE` : 'Verified Engineer'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="pt-1">
+                  <div className="py-1">
                     <button
                       onClick={() => {
                         setMenuOpen(false);
@@ -109,7 +109,7 @@ export function Header() {
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-destructive hover:bg-destructive/10 transition-colors font-medium text-left"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>Oturumu Kapat</span>
+                      <span>Sign Out</span>
                     </button>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export function Header() {
         </div>
       </header>
 
-      {/* Confirmation Sign Out Modal */}
+      {/* Center Screen Confirmation Sign Out Modal */}
       <SignOutModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

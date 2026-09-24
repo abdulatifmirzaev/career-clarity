@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const { email } = body;
 
     if (!email || !email.includes('@')) {
-      return jsonError('Lütfen geçerli bir e-posta adresi girin.', 400);
+      return jsonError('Please enter a valid email address.', 400);
     }
 
     const normalizedEmail = email.toLowerCase().trim();
@@ -14,20 +14,20 @@ export async function POST(request: Request) {
     // Check if account already exists
     const existing = serverStore.findUserByEmail(normalizedEmail);
     if (existing) {
-      return jsonError('Bu e-posta adresi ile zaten kayıtlı bir hesap bulunmaktadır.', 409);
+      return jsonError('An account with this email address already exists.', 409);
     }
 
     // Generate 6-digit OTP
     const code = serverStore.createVerificationCode(normalizedEmail);
 
     return jsonSuccess({
-      message: 'Doğrulama kodu e-posta adresinize gönderildi.',
+      message: 'Verification code sent to your email address.',
       email: normalizedEmail,
       // In production/cloud simulation, return code for seamless user feedback if needed
       code,
       expiresInMinutes: 10,
     });
   } catch {
-    return jsonError('Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.', 500);
+    return jsonError('Failed to send verification code. Please try again.', 500);
   }
 }

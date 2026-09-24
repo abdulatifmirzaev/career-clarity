@@ -53,11 +53,11 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/stats');
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.message || 'İstatistikler yüklenemedi');
+        throw new Error(data.message || 'Failed to load telemetry statistics.');
       }
       setStats(data.data);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Veri alınırken hata oluştu');
+      setError(err instanceof Error ? err.message : 'Error fetching telemetry data.');
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
   const formatUptime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}s ${minutes}dk`;
+    return `${hours}h ${minutes}m`;
   };
 
   return (
@@ -79,10 +79,10 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-            Yönetici Genel Bakış Paneli
+            Executive Analytics & Overview Console
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Canlı kullanıcı aktiviteleri, veritabanı sağlık durumu ve yetkinlik metrikleri
+            Real-time platform metrics, database telemetry, and engineering leveling distribution
           </p>
         </div>
 
@@ -93,14 +93,14 @@ export default function AdminDashboardPage() {
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Yenile</span>
+            <span>Refresh</span>
           </button>
 
           <Link
             href="/admin/users"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-cyan-600 hover:bg-cyan-500 text-white shadow-sm shadow-cyan-600/30 transition-all"
           >
-            <span>Kullanıcıları Yönet</span>
+            <span>Manage Users</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
         {/* Total Users */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Toplam Kullanıcı</span>
+            <span className="text-xs font-medium text-slate-400">Total Registered Users</span>
             <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
               <Users className="w-4 h-4" />
             </div>
@@ -127,18 +127,18 @@ export default function AdminDashboardPage() {
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {stats?.totalUsers ?? '...'}
             </span>
-            <span className="text-[11px] text-emerald-400 font-medium">Aktif Hesap</span>
+            <span className="text-[11px] text-emerald-400 font-medium">Active Accounts</span>
           </div>
           <p className="text-[11px] text-slate-500 mt-2">
-            {stats?.roleDistribution?.admins ?? 0} Yönetici &bull;{' '}
-            {stats?.roleDistribution?.users ?? 0} Standart Kullanıcı
+            {stats?.roleDistribution?.admins ?? 0} Admins &bull;{' '}
+            {stats?.roleDistribution?.users ?? 0} Standard Engineers
           </p>
         </div>
 
         {/* Total Assessments */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Tamamlanan Raporlar</span>
+            <span className="text-xs font-medium text-slate-400">Completed Reports</span>
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
               <FileCheck2 className="w-4 h-4" />
             </div>
@@ -147,17 +147,17 @@ export default function AdminDashboardPage() {
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {stats?.totalAssessments ?? '...'}
             </span>
-            <span className="text-[11px] text-emerald-400 font-medium">Kariyer Raporu</span>
+            <span className="text-[11px] text-emerald-400 font-medium">Diagnostic Reports</span>
           </div>
           <p className="text-[11px] text-slate-500 mt-2">
-            Otomatik seviye kalibrasyonu ve GAP analizleri
+            Algorithmic level calibration and gap diagnostics
           </p>
         </div>
 
         {/* Total Questions */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Aktif Soru Bankası</span>
+            <span className="text-xs font-medium text-slate-400">Active Question Bank</span>
             <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
               <HelpCircle className="w-4 h-4" />
             </div>
@@ -166,17 +166,15 @@ export default function AdminDashboardPage() {
             <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
               {stats?.totalQuestions ?? '...'}
             </span>
-            <span className="text-[11px] text-amber-400 font-medium">Mülakat Sorusu</span>
+            <span className="text-[11px] text-amber-400 font-medium">Interview Questions</span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-2">
-            Sistem Tasarımı, Algoritmalar, Davranışsal
-          </p>
+          <p className="text-[11px] text-slate-500 mt-2">System Design, DSA, AI Architecture</p>
         </div>
 
         {/* Success Rate */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-400">Soru Çözüm Başarısı</span>
+            <span className="text-xs font-medium text-slate-400">Interview Accuracy</span>
             <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
               <TrendingUp className="w-4 h-4" />
             </div>
@@ -186,11 +184,11 @@ export default function AdminDashboardPage() {
               %{stats?.successRate ?? '0'}
             </span>
             <span className="text-[11px] text-cyan-400 font-medium">
-              {stats?.solvedAttempts ?? 0}/{stats?.totalAttempts ?? 0} Doğru
+              {stats?.solvedAttempts ?? 0}/{stats?.totalAttempts ?? 0} Solved
             </span>
           </div>
           <p className="text-[11px] text-slate-500 mt-2">
-            Platform genelinde çözülen soruların oranı
+            Platform-wide candidate success accuracy
           </p>
         </div>
       </div>
@@ -201,9 +199,9 @@ export default function AdminDashboardPage() {
         <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-white">Mühendislik Seviye Dağılımı</h2>
+              <h2 className="text-sm font-semibold text-white">Engineering Level Distribution</h2>
               <p className="text-xs text-slate-400">
-                Değerlendirme sonucunda kalibre edilen seviyeler
+                Calibrated levels across completed diagnostic evaluations
               </p>
             </div>
             <span className="text-xs text-cyan-400 font-mono">L1 - L5 Scale</span>
@@ -250,7 +248,7 @@ export default function AdminDashboardPage() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-300 font-medium">{lvl.name}</span>
                     <span className="text-slate-400 font-mono">
-                      {lvl.count} aday ({percentage}%)
+                      {lvl.count} engineers ({percentage}%)
                     </span>
                   </div>
                   <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
@@ -269,10 +267,10 @@ export default function AdminDashboardPage() {
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-white">Sistem & Veritabanı</h2>
+              <h2 className="text-sm font-semibold text-white">System & Database Health</h2>
               <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Sağlıklı
+                Healthy
               </span>
             </div>
 
@@ -280,7 +278,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800">
                 <span className="text-slate-400 flex items-center gap-2">
                   <Server className="w-3.5 h-3.5 text-cyan-400" />
-                  Veritabanı Katmanı
+                  Database Engine
                 </span>
                 <span className="font-mono text-emerald-400 font-medium">Prisma / PostgreSQL</span>
               </div>
@@ -288,7 +286,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800">
                 <span className="text-slate-400 flex items-center gap-2">
                   <Cpu className="w-3.5 h-3.5 text-blue-400" />
-                  Node Çalışma Zamanı
+                  Node Runtime
                 </span>
                 <span className="font-mono text-slate-200">
                   {stats?.systemHealth?.nodeVersion || 'v20+'}
@@ -298,7 +296,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800">
                 <span className="text-slate-400 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  Sunucu Çalışma Süresi
+                  Server Uptime
                 </span>
                 <span className="font-mono text-slate-200">
                   {stats ? formatUptime(stats.systemHealth.uptimeSeconds) : '...'}
@@ -308,7 +306,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-950 border border-slate-800">
                 <span className="text-slate-400 flex items-center gap-2">
                   <TrendingUp className="w-3.5 h-3.5 text-purple-400" />
-                  Aktif Bellek Kullanımı
+                  Active Memory Usage
                 </span>
                 <span className="font-mono text-slate-200">
                   {stats?.systemHealth?.memoryUsageMb ?? 0} MB
@@ -319,7 +317,7 @@ export default function AdminDashboardPage() {
 
           <div className="pt-4 mt-4 border-t border-slate-800">
             <div className="text-[11px] text-slate-500 flex items-center justify-between">
-              <span>Bağlı Hesap:</span>
+              <span>Connected Session:</span>
               <span className="text-cyan-400 font-medium">
                 {stats?.currentAdmin?.email || 'abdulatif.mirzaev2004@gmail.com'}
               </span>

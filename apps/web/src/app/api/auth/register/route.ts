@@ -10,12 +10,12 @@ export async function POST(request: Request) {
     }
 
     if (!verificationCode) {
-      return jsonError('6 haneli e-posta doğrulama kodu zorunludur.', 400);
+      return jsonError('6-digit email verification code is required.', 400);
     }
 
     const isCodeValid = serverStore.verifyCode(email, verificationCode);
     if (!isCodeValid) {
-      return jsonError('Girilen 6 haneli doğrulama kodu hatalı veya süresi dolmuş.', 400);
+      return jsonError('Invalid or expired verification code.', 400);
     }
 
     const existingUser = serverStore.findUserByEmail(email);

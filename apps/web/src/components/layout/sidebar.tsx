@@ -2,20 +2,17 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Compass,
   FileCheck2,
   HelpCircle,
   LayoutDashboard,
   Layers,
-  LogOut,
   User as UserIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
-import { Button } from '@/components/ui/button';
-import { SignOutModal } from './sign-out-modal';
 
 export const navItems = [
   {
@@ -47,9 +44,7 @@ export const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, isAuthenticated, clearAuth } = useAuthStore();
-  const [showSignOut, setShowSignOut] = React.useState(false);
+  const { user, isAuthenticated } = useAuthStore();
 
   return (
     <aside className="hidden md:flex flex-col w-64 border-r border-border/40 bg-card/40 backdrop-blur-xl h-screen sticky top-0 z-30 select-none">
@@ -69,7 +64,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Links */}
-      <nav aria-label="Main Navigation" className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Main Navigation">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -94,31 +89,19 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Footer Section */}
+      {/* User Footer Section (Clean Information Display) */}
       <div className="p-4 border-t border-border/40 bg-card/20">
         {isAuthenticated && user ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="h-9 w-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-semibold text-xs shrink-0">
-                {user.name ? user.name.slice(0, 2).toUpperCase() : 'ME'}
-              </div>
-              <div className="flex flex-col overflow-hidden">
-                <span className="text-xs font-semibold truncate text-foreground">
-                  {user.name || 'Yazılım Mühendisi'}
-                </span>
-                <span className="text-[11px] text-muted-foreground truncate">{user.email}</span>
-              </div>
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="h-9 w-9 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-semibold text-xs shrink-0">
+              {user.name ? user.name.slice(0, 2).toUpperCase() : 'ME'}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 min-h-[36px] min-w-[36px] text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-              onClick={() => setShowSignOut(true)}
-              title="Oturumu Kapat"
-              aria-label="Oturumu Kapat"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-xs font-semibold truncate text-foreground">
+                {user.name || 'Verified Engineer'}
+              </span>
+              <span className="text-[11px] text-muted-foreground truncate">{user.email}</span>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -138,16 +121,6 @@ export function Sidebar() {
           </div>
         )}
       </div>
-
-      <SignOutModal
-        isOpen={showSignOut}
-        onClose={() => setShowSignOut(false)}
-        onConfirm={() => {
-          clearAuth();
-          setShowSignOut(false);
-          router.push('/auth/login');
-        }}
-      />
     </aside>
   );
 }

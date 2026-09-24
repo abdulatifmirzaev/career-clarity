@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -39,25 +38,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     {
-      label: 'Genel Bakış & Metrikler',
+      label: 'Overview & Analytics',
       href: '/admin',
       icon: LayoutDashboard,
       active: pathname === '/admin',
     },
     {
-      label: 'Kullanıcı Yönetimi',
+      label: 'User Management',
       href: '/admin/users',
       icon: Users,
       active: pathname.startsWith('/admin/users'),
     },
     {
-      label: 'Mülakat & Soru Bankası',
+      label: 'Interview Question Bank',
       href: '/admin/questions',
       icon: HelpCircle,
       active: pathname.startsWith('/admin/questions'),
     },
     {
-      label: 'Sistem & Güvenlik Günlüğü',
+      label: 'System & Audit Logs',
       href: '/admin/audit',
       icon: Activity,
       active: pathname.startsWith('/admin/audit'),
@@ -98,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <h2 className="font-bold text-sm tracking-tight text-white">Admin Console</h2>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[11px] text-slate-400">Canlı Sistem</span>
+                <span className="text-[11px] text-slate-400">Live System</span>
               </div>
             </div>
           </div>
@@ -119,7 +118,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
@@ -131,7 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   <Icon className="w-4 h-4" />
                   <span>{item.label}</span>
-                </Link>
+                </a>
               );
             })}
           </nav>
@@ -142,13 +141,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-semibold tracking-wider uppercase text-cyan-400">
-                Süper Yönetici
+                Superadmin
               </span>
               <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60 font-mono font-bold">
                 ROOT
               </span>
             </div>
-            <p className="text-xs font-semibold text-white truncate">Abdulatif Mirzaev</p>
+            <p className="text-xs font-semibold text-white truncate">Abdulatif MIRZAEV</p>
             <p className="text-[11px] text-slate-400 truncate">abdulatif.mirzaev2004@gmail.com</p>
           </div>
 
@@ -157,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-medium text-red-400 hover:text-red-300 bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 hover:border-red-800/50 transition-all"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Yönetici Oturumunu Kapat</span>
+            <span>Sign Out of Console</span>
           </button>
         </div>
       </aside>
@@ -171,18 +170,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <LogOut className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">
-                  Yönetici Oturumu Kapatılsın mı?
-                </h3>
+                <h3 className="text-sm font-semibold text-white">Sign Out of Console?</h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Admin konsol erişiminiz sonlandırılacaktır.
+                  Your active administrative session will be terminated.
                 </p>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Panelden çıkış yaptığınızda tekrar erişebilmek için e-posta ve şifrenizle giriş
-              yapmanız gerekecektir.
+              You will need to sign in with your credentials to access the console again.
             </p>
 
             <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
@@ -191,7 +187,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 onClick={() => setShowLogoutModal(false)}
                 className="px-3.5 py-2 rounded-xl text-xs text-slate-400 hover:text-white bg-slate-800/60 transition-colors"
               >
-                Vazgeç
+                Cancel
               </button>
 
               <button
@@ -200,7 +196,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 className="px-4 py-2 rounded-xl text-xs font-medium bg-red-600 hover:bg-red-500 text-white transition-colors flex items-center gap-1.5"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>Evet, Güvenli Çıkış Yap</span>
+                <span>Confirm Sign Out</span>
               </button>
             </div>
           </div>

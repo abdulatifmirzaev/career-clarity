@@ -13,7 +13,7 @@ import {
   User,
   ShieldCheck,
   RotateCcw,
-  CheckCircle2,
+  KeyRound,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -32,10 +32,10 @@ import { apiClient } from '@/lib/api-client';
 import { useAuthStore } from '@/stores/auth-store';
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'İsim en az 2 karakter olmalıdır'),
-  email: z.string().email('Lütfen geçerli bir e-posta adresi girin'),
-  password: z.string().min(8, 'Şifre en az 8 karakter uzunluğunda olmalıdır'),
-  yearsExp: z.number().min(0, 'Negatif olamaz').max(50, 'Geçersiz deneyim yılı'),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+  yearsExp: z.number().min(0, 'Experience cannot be negative').max(50, 'Invalid years'),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -44,7 +44,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  // Step state: 1 = Form, 2 = Verification OTP
+  // Step state: 1 = Registration Details, 2 = 6-Digit OTP Verification
   const [step, setStep] = React.useState<1 | 2>(1);
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -62,14 +62,14 @@ export default function RegisterPage() {
     },
   });
 
-  // Countdown timer for resend code
+  // Countdown timer for code resend
   React.useEffect(() => {
     if (resendCooldown <= 0) return;
     const timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  // Step 1: Send verification code
+  // Step 1: Request OTP Verification Code
   const handleRequestCode = async (values: RegisterFormValues) => {
     setIsLoading(true);
     setServerError(null);
@@ -91,14 +91,14 @@ export default function RegisterPage() {
       setResendCooldown(45);
     } catch (err: unknown) {
       setServerError(
-        err instanceof Error ? err.message : 'Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.',
+        err instanceof Error ? err.message : 'Failed to send verification code. Please try again.',
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Resend code handler
+  // Resend OTP Code
   const handleResendCode = async () => {
     if (resendCooldown > 0) return;
     setIsLoading(true);
@@ -112,17 +112,17 @@ export default function RegisterPage() {
       if (res.code) setPreviewCode(res.code);
       setResendCooldown(45);
     } catch (err: unknown) {
-      setServerError(err instanceof Error ? err.message : 'Kod tekrar gönderilemedi.');
+      setServerError(err instanceof Error ? err.message : 'Could not resend verification code.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Step 2: Verify code and finalize registration
+  // Step 2: Verify OTP and Register Account
   const handleVerifyAndRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!verificationCode || verificationCode.trim().length < 6) {
-      setServerError('Lütfen 6 haneli doğrulama kodunu eksiksiz girin.');
+      setServerError('Please enter the full 6-digit verification code.');
       return;
     }
 
@@ -153,7 +153,9 @@ export default function RegisterPage() {
       setAuth(data.user, data.accessToken, data.refreshToken);
       router.push('/onboarding');
     } catch (err: unknown) {
-      setServerError(err instanceof Error ? err.message : 'Kayıt tamamlanamadı.');
+      setServerError(
+        err instanceof Error ? err.message : 'Registration failed. Please verify your OTP code.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -167,12 +169,12 @@ export default function RegisterPage() {
             {step === 1 ? 'CC' : <ShieldCheck className="h-6 w-6" />}
           </div>
           <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight">
-            {step === 1 ? 'Hesabınızı Oluşturun' : 'E-Postanızı Doğrulayın'}
+            {step === 1 ? 'Create Your Account' : 'Verify Your Email'}
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm text-muted-foreground">
             {step === 1
-              ? 'Yapay zeka çağında seviye analizi ve kariyer haritanızı başlatın.'
-              : `${form.getValues('email')} adresine 6 haneli güvenlik kodu iletildi.`}
+              ? 'Start your AI-era engineering leveling and career benchmark diagnostic.'
+              : `We sent a 6-digit security code to ${form.getValues('email')}.`}
           </CardDescription>
         </CardHeader>
 
@@ -182,12 +184,12 @@ export default function RegisterPage() {
           </div>
         )}
 
-        {/* STEP 1: Registration Form */}
+        {/* STEP 1: Account Creation Form */}
         {step === 1 && (
           <form onSubmit={form.handleSubmit(handleRequestCode)}>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="name">Ad Soyad</Label>
+                <Label htmlFor="name">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -204,7 +206,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email">E-posta Adresi</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -222,7 +224,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="password">Şifre (en az 8 karakter)</Label>
+                <Label htmlFor="password">Password (min 8 characters)</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -242,7 +244,7 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="yearsExp">Profesyonel Deneyim (Yıl)</Label>
+                <Label htmlFor="yearsExp">Years of Professional Experience</Label>
                 <Input
                   id="yearsExp"
                   type="number"
@@ -264,52 +266,52 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Doğrulama Kodu Gönderiliyor...</span>
+                    <span>Sending Security Code...</span>
                   </>
                 ) : (
                   <>
-                    <span>Doğrulama Kodu İste</span>
+                    <span>Send Verification Code</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
               </Button>
 
               <p className="text-xs text-center text-muted-foreground">
-                Zaten bir hesabınız var mı?{' '}
+                Already have an account?{' '}
                 <Link
                   href="/auth/login"
                   className="font-medium text-foreground underline underline-offset-4 hover:text-primary transition-colors"
                 >
-                  Giriş Yap
+                  Sign In
                 </Link>
               </p>
             </CardFooter>
           </form>
         )}
 
-        {/* STEP 2: Verification Code (OTP) */}
+        {/* STEP 2: 6-Digit OTP Verification Screen */}
         {step === 2 && (
           <form onSubmit={handleVerifyAndRegister}>
             <CardContent className="space-y-5">
-              {/* Dev Simulation Badge */}
+              {/* Verification Dispatch Notice */}
               {previewCode && (
-                <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-cyan-200 text-xs flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-cyan-200 text-xs flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                    <span>Güvenlik Doğrulama Kodu:</span>
+                    <KeyRound className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                    <span className="font-medium">Verification Passcode:</span>
                   </div>
-                  <code className="px-2 py-0.5 rounded bg-cyan-900/60 font-mono font-bold text-sm tracking-wider text-cyan-300 border border-cyan-700/50">
+                  <code className="px-2.5 py-1 rounded bg-cyan-900/80 font-mono font-bold text-sm tracking-widest text-cyan-300 border border-cyan-700/60 shadow-inner">
                     {previewCode}
                   </code>
                 </div>
               )}
 
-              <div className="space-y-2">
+              <div className="space-y-3 pt-2">
                 <Label
                   htmlFor="otp"
-                  className="text-xs font-semibold text-center block text-slate-300"
+                  className="text-xs font-semibold text-center block text-slate-300 uppercase tracking-wider"
                 >
-                  6 Haneli Doğrulama Kodunu Girin
+                  Enter 6-Digit OTP Code
                 </Label>
                 <div className="flex justify-center">
                   <Input
@@ -320,15 +322,15 @@ export default function RegisterPage() {
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
                     placeholder="••••••"
-                    className="w-48 text-center text-2xl tracking-[0.4em] font-mono font-bold py-3 bg-background/80 border-border/80 rounded-xl"
+                    className="w-52 text-center text-3xl tracking-[0.45em] font-mono font-bold py-4 bg-background/90 border-border/80 rounded-xl shadow-inner focus:ring-cyan-500 focus:border-cyan-500"
                   />
                 </div>
                 <p className="text-[11px] text-center text-muted-foreground">
-                  Kod 10 dakika boyunca geçerlidir.
+                  The security passcode is valid for 10 minutes.
                 </p>
               </div>
 
-              {/* Resend button with cooldown */}
+              {/* Resend button with countdown */}
               <div className="flex items-center justify-center pt-1">
                 <button
                   type="button"
@@ -337,7 +339,9 @@ export default function RegisterPage() {
                   className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  {resendCooldown > 0 ? `Tekrar Gönder (${resendCooldown}s)` : 'Kodu Tekrar Gönder'}
+                  {resendCooldown > 0
+                    ? `Resend Code in 00:${resendCooldown < 10 ? `0${resendCooldown}` : resendCooldown}`
+                    : 'Resend Passcode'}
                 </button>
               </div>
             </CardContent>
@@ -347,11 +351,11 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Doğrulanıyor ve Hesap Açılıyor...</span>
+                    <span>Verifying Code & Activating Account...</span>
                   </>
                 ) : (
                   <>
-                    <span>Hesabı Doğrula ve Başla</span>
+                    <span>Verify & Complete Registration</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
@@ -363,7 +367,7 @@ export default function RegisterPage() {
                 className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                Bilgileri Düzenle
+                Edit Account Details
               </button>
             </CardFooter>
           </form>
