@@ -4,7 +4,7 @@ import { UserProfile } from '@career-clarity/shared-types';
 const DEFAULT_GUEST_USER: UserProfile = {
   id: 'guest-user',
   email: 'guest@career-clarity.dev',
-  name: 'Alex Chen',
+  name: null,
   yearsExp: 4,
   primaryStack: 'Full-Stack Engineering (React, Node.js, Cloud System Architecture)',
   createdAt: new Date().toISOString(),

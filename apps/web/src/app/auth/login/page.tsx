@@ -148,7 +148,9 @@ function LoginForm() {
             className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-dashed border-border/80 hover:border-primary/50 bg-secondary/20 hover:bg-secondary/40 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span className="font-medium">1-Click Demo Sign-in (Alex Chen • Senior SE)</span>
+            <span className="font-medium">
+              1-Click Instant Demo Access (Senior Software Engineer)
+            </span>
           </button>
         </CardContent>
 

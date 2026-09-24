@@ -74,7 +74,7 @@ export default function DashboardPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-bold tracking-tight text-foreground">
-              Welcome, {user?.name || 'Engineer'}
+              Engineering Career Diagnostic Report
             </h2>
             <Badge
               variant="outline"
