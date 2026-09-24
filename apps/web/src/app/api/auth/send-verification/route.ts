@@ -30,7 +30,7 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Career Clarity <noreply@career-clarity.dev>',
+            from: 'Career Clarity <onboarding@resend.dev>',
             to: [normalizedEmail],
             subject: 'Your 6-Digit Email Verification Code',
             html: `
