@@ -170,16 +170,27 @@ export default function InterviewPrepPage() {
         </div>
 
         {/* Live Progress Bar */}
-        <div className="flex flex-col sm:items-end gap-1.5 shrink-0 min-w-[200px]">
-          <div className="flex items-center justify-between w-full text-xs">
-            <span className="text-muted-foreground">Preparation Progress</span>
-            <span className="font-bold font-mono text-primary">
-              {stats?.solvedCount ?? 0} / {stats?.totalQuestions ?? 30} (
-              {stats?.progressPercentage ?? 0}%)
-            </span>
-          </div>
-          <Progress value={stats?.progressPercentage ?? 0} className="h-2 w-full" />
-        </div>
+        {(() => {
+          const levelStats = selectedLevel > 0 ? stats?.levelBreakdown?.[selectedLevel] : null;
+          const displayTotal = levelStats
+            ? levelStats.total
+            : (stats?.totalQuestions ?? questions.length);
+          const displaySolved = levelStats ? levelStats.solved : (stats?.solvedCount ?? 0);
+          const displayPercent =
+            displayTotal > 0 ? Math.round((displaySolved / displayTotal) * 100) : 0;
+
+          return (
+            <div className="flex flex-col sm:items-end gap-1.5 shrink-0 min-w-[200px]">
+              <div className="flex items-center justify-between w-full text-xs">
+                <span className="text-muted-foreground">Preparation Progress</span>
+                <span className="font-bold font-mono text-primary">
+                  {displaySolved} / {displayTotal} ({displayPercent}%)
+                </span>
+              </div>
+              <Progress value={displayPercent} className="h-2 w-full" />
+            </div>
+          );
+        })()}
       </div>
 
       {/* Filter and Search Controls */}
@@ -273,9 +284,10 @@ export default function InterviewPrepPage() {
         ) : questions.length === 0 ? (
           <Card className="p-12 text-center border-border/60">
             <HelpCircle className="h-8 w-8 text-muted-foreground/50 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-foreground">No questions found</p>
+            <p className="text-sm font-semibold text-foreground">No questions matching filter</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Try adjusting your category, level filter, or search query.
+              No calibrated questions match your active level or category filters. Questions are
+              managed dynamically via the Admin Panel.
             </p>
           </Card>
         ) : (
