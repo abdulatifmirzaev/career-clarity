@@ -13,7 +13,7 @@ import {
   User,
   ShieldCheck,
   RotateCcw,
-  KeyRound,
+  CheckCircle2,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -49,7 +49,6 @@ export default function RegisterPage() {
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [verificationCode, setVerificationCode] = React.useState('');
-  const [previewCode, setPreviewCode] = React.useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = React.useState(0);
 
   const form = useForm<RegisterFormValues>({
@@ -75,17 +74,10 @@ export default function RegisterPage() {
     setServerError(null);
 
     try {
-      const res = await apiClient<{ message: string; email: string; code?: string }>(
-        '/auth/send-verification',
-        {
-          method: 'POST',
-          body: { email: values.email },
-        },
-      );
-
-      if (res.code) {
-        setPreviewCode(res.code);
-      }
+      await apiClient<{ message: string; email: string }>('/auth/send-verification', {
+        method: 'POST',
+        body: { email: values.email },
+      });
 
       setStep(2);
       setResendCooldown(45);
@@ -105,11 +97,10 @@ export default function RegisterPage() {
     setServerError(null);
     try {
       const email = form.getValues('email');
-      const res = await apiClient<{ code?: string }>('/auth/send-verification', {
+      await apiClient<{ message: string }>('/auth/send-verification', {
         method: 'POST',
         body: { email },
       });
-      if (res.code) setPreviewCode(res.code);
       setResendCooldown(45);
     } catch (err: unknown) {
       setServerError(err instanceof Error ? err.message : 'Could not resend verification code.');
@@ -293,18 +284,14 @@ export default function RegisterPage() {
         {step === 2 && (
           <form onSubmit={handleVerifyAndRegister}>
             <CardContent className="space-y-5">
-              {/* Verification Dispatch Notice */}
-              {previewCode && (
-                <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-cyan-200 text-xs flex items-center justify-between shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <KeyRound className="w-4 h-4 text-cyan-400 flex-shrink-0" />
-                    <span className="font-medium">Verification Passcode:</span>
-                  </div>
-                  <code className="px-2.5 py-1 rounded bg-cyan-900/80 font-mono font-bold text-sm tracking-widest text-cyan-300 border border-cyan-700/60 shadow-inner">
-                    {previewCode}
-                  </code>
-                </div>
-              )}
+              {/* Email Sent Notice */}
+              <div className="p-3.5 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-cyan-200 text-xs flex items-center gap-2.5 shadow-sm">
+                <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                <span className="leading-relaxed">
+                  A 6-digit passcode has been sent to <strong>{form.getValues('email')}</strong>.
+                  Please check your inbox or spam folder.
+                </span>
+              </div>
 
               <div className="space-y-3 pt-2">
                 <Label
@@ -351,7 +338,7 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Verifying Code & Activating Account...</span>
+                    <span>Verifying...</span>
                   </>
                 ) : (
                   <>
@@ -363,11 +350,14 @@ export default function RegisterPage() {
 
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center justify-center gap-1 transition-colors"
+                onClick={() => {
+                  setStep(1);
+                  setServerError(null);
+                }}
+                className="text-xs text-center text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 py-1 transition-colors"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Edit Account Details
+                <ArrowLeft className="w-3 h-3" />
+                <span>Edit Account Details</span>
               </button>
             </CardFooter>
           </form>
